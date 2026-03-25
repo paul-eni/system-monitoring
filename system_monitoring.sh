@@ -61,3 +61,21 @@ swapAvailable=$(awk '{print $4}' <<< "$swapMemory")
 
 # "< <" secures the output from df into a temp file which is then passed on to read 
 read totalDisk usedDisk availableDisk diskUsage < <(df -h --total | awk '/total/ {print $2, $3, $4, $5}')
+
+
+
+### [SYSTEM] ###
+
+read uptimeInSeconds _ < /proc/uptime
+uptimeInSeconds=${uptimeInSeconds%.*}
+uptimeDays=$(( uptimeInSeconds/86400 ))
+uptimeHours=$(( (uptimeInSeconds%86400)/3600 ))
+uptimeMinutes=$(( (uptimeInSeconds%3600)/60 ))
+uptime=$(printf "%s days, %s hours, %s minutes" "$uptimeDays" "$uptimeHours" "$uptimeMinutes")
+
+# -e means that all processes are fetched and then only the PID column is kept with -o
+numberOfProc=$(ps -e -o pid --no-headers | wc -l)
+
+#paste -sd enables to reformat the output by separing each entry by a comma,
+#'-' is mandatory to block paste from expecting a file and using stdin instead 
+currentlyLoggedInUsers=$(who | awk '{print $1}' | sort -u | paste -sd "," - | sed 's/,/, /' )
