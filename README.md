@@ -1,19 +1,19 @@
 # Ubuntu minimal server monitoring script
 
 
-## description
+## Description
 
 A Bash-based monitoring script for a minimalist Ubuntu server that collects key metrics (such RAM and network information for instance) using only native Linux system files and commands (e.g. /proc/stat...), without external dependencies.
 
 
-## goal
+## Goal
 
 This project emerged as a learning project to improve bash skills as well as Linux's architecture and overall behaviour. 
 
 As such, its main purpose consists of delivering desired output without dependencies other than the ones provided during by the server's ISO image.
 
 
-## features
+## Features
 
 The scripts monitors the following:
 - CPU: usage, load average
@@ -23,7 +23,7 @@ The scripts monitors the following:
 - Network: IPs, interfaces, ports
 
 
-## install and execution
+## Install and execution
 
 1. Clone the repository:
 
@@ -38,17 +38,14 @@ cd system-monitoring
 ./system_monitoring.sh
 ```
 
-/!\ if the script fails to launch, please check file's permission with
-```bash
-ls -l
-```
-if letter 'x' is missing after 'u', trigger the following to allow script's execution for you only 
+/!\ if the script fails to launch, check file's permission with
+``` ls -l ``` ; if letter 'x' is missing on the fourth position (system_monitoring.sh's line, first column), trigger the following to allow script's execution for you only: 
 ```bash
 chmod u+x system_monitoring.sh
 ```
 
 
-## output example
+## Output example
 
 ```text
 ==================== SYSTEM MONITOR ====================
@@ -83,14 +80,14 @@ Listened ports       :  53, 68
 ```
 
 
-## technical choices
+## Technical choices
 
 - Ubuntu server's version: Ubuntu 24.04.4 LTS
 
-- metrics sources: I tried to stick as close as possible to Linux's data source. Therefore, I prioritized system files over commands.
+- Metrics sources: I tried to stick as close as possible to Linux's data source. Therefore, I prioritized system files over commands.
 For instance, instead of using ```top ``` command for CPU usage, I searched for the values in /proc/stat file.
 
-## possible improvements
+## Possible improvements
 
 Possible improvements:
 - Refactor output to separate data retrieval and display
