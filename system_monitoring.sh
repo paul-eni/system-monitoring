@@ -79,3 +79,13 @@ numberOfProc=$(ps -e -o pid --no-headers | wc -l)
 #paste -sd enables to reformat the output by separing each entry by a comma,
 #'-' is mandatory to block paste from expecting a file and using stdin instead 
 currentlyLoggedInUsers=$(who | awk '{print $1}' | sort -u | paste -sd "," - | sed 's/,/, /' )
+
+
+
+### [NETWORK] ###
+
+serverIPAddresses=$(ip -4 address show up | awk '/inet/ {print $2}' | paste -sd "," - | sed 's/,/, /' )
+ipInterfaces=$(ip -br address show up | awk '{print $1}' | paste -sd "," - | sed 's/,/, /' ) 
+
+#list of active TCP/UDP ports
+ports=$(ss -ltun | awk 'NR > 1 {split($5, a, ":"); print a[length(a)]}' | sort -u | paste -sd "," - | sed 's/,/, /' )
