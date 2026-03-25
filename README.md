@@ -88,7 +88,7 @@ Listened ports       :  53, 68
 - Ubuntu server's version: Ubuntu 24.04.4 LTS
 
 - metrics sources: I tried to stick as close as possible to Linux's data source. Therefore, I prioritized system files over commands.
-For instance, instead of using ```bash top ``` command for CPU usage, I searched for the values in /proc/stat file.
+For instance, instead of using ```top ``` command for CPU usage, I searched for the values in /proc/stat file.
 
 ## possible improvements
 
