@@ -55,3 +55,9 @@ usedMemory=$(awk '{print $3}' <<< "$memory")
 availableMemory=$(awk '{print $7}' <<< "$memory")
 
 swapAvailable=$(awk '{print $4}' <<< "$swapMemory")
+
+
+### [DISK] ###
+
+# "< <" secures the output from df into a temp file which is then passed on to read 
+read totalDisk usedDisk availableDisk diskUsage < <(df -h --total | awk '/total/ {print $2, $3, $4, $5}')
