@@ -89,3 +89,39 @@ ipInterfaces=$(ip -br address show up | awk '{print $1}' | paste -sd "," - | sed
 
 #list of active TCP/UDP ports
 ports=$(ss -ltun | awk 'NR > 1 {split($5, a, ":"); print a[length(a)]}' | sort -u | paste -sd "," - | sed 's/,/, /' )
+
+
+
+### [OUTPUT DISPLAY] ###
+
+printf "\n==================== SYSTEM MONITOR ====================\n\n"
+
+printf "[CPU]\n"
+printf "%-20s : %s%%\n" "Usage" "$CPUUsage"
+loadavg="$oneMinuteLoad, $fiveMinutesLoad, $fifteenMinutesLoad"
+printf "%-20s : %s\n" "Load Average" "$loadavg"
+
+printf "\n[MEMORY]\n"
+printf "%-20s : %s \n" "Total" "$totalMemory"
+printf "%-20s : %s \n" "Used" "$usedMemory"
+printf "%-20s : %s \n" "Available" "$availableMemory"
+printf "%-20s : %s \n" "Swap available" "$swapAvailable"
+
+printf "\n[DISK]\n"
+printf "%-20s : %s \n" "Total" "$totalDisk"
+printf "%-20s : %s \n" "Used" "$usedDisk"
+printf "%-20s : %s \n" "Available" "$availableDisk"
+printf "%-20s : %s\n" "Usage" "$diskUsage"
+
+printf "\n[SYSTEM]\n"
+printf "%-20s : %s\n" "Uptime" "$uptime"
+printf "%-20s : %s\n" "Processes" "$numberOfProc"
+printf "%-20s : %s\n" "Logged in users" "$currentlyLoggedInUsers"
+
+printf "\n[NETWORK]\n"
+
+printf "%-20s : %s\n" "IP addresses" "$serverIPAddresses"
+printf "%-20s : %s\n" "IP interfaces" "$ipInterfaces"
+printf "%-20s : %s\n" "Listened ports" "$ports"
+
+printf "\n========================================================\n"
