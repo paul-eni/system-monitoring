@@ -41,3 +41,17 @@ fi
 
 #system load average, if > 1 the CPU is overworked)
 read oneMinuteLoad fiveMinutesLoad fifteenMinutesLoad _ < /proc/loadavg
+
+
+
+### [MEMORY] ###
+
+freeCommandOutput=$(free --si -h)
+memory=$(grep Mem: <<< "$freeCommandOutput")
+swapMemory=$(grep Swap: <<< "$freeCommandOutput")
+
+totalMemory=$(awk '{print $2}' <<< "$memory")
+usedMemory=$(awk '{print $3}' <<< "$memory")
+availableMemory=$(awk '{print $7}' <<< "$memory")
+
+swapAvailable=$(awk '{print $4}' <<< "$swapMemory")
