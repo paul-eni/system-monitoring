@@ -1,2 +1,43 @@
 #!/bin/bash
 
+### [CPU] ###
+
+#global CPU usage in % 
+#first snapshot
+firstCPUSnapshot=$(grep '^cpu ' /proc/stat)
+
+#wait 1 second 
+sleep 1 
+
+#second snapshot
+secondCPUSnapshot=$(grep '^cpu ' /proc/stat)
+
+#Deltas between the two snapshots
+read buffer userSnapshotOne niceSnapshotOne systemSnapshotOne idleSnapshotOne iowaitSnapshotOne irqSnapshotOne softIrqSnapshotOne stealSnapshotOne _ <<< "$firstCPUSnapshot"
+read buffer userSnapshotTwo niceSnapshotTwo systemSnapshotTwo idleSnapshotTwo iowaitSnapshotTwo irqSnapshotTwo softIrqSnapshotTwo stealSnapshotTwo _ <<< "$secondCPUSnapshot"
+
+deltaUser=$(( userSnapshotTwo-userSnapshotOne ))
+deltaNice=$(( niceSnapshotTwo-niceSnapshotOne ))
+deltaSystem=$(( systemSnapshotTwo-systemSnapshotOne ))
+deltaIdle=$(( idleSnapshotTwo-idleSnapshotOne ))
+deltaIowait=$(( iowaitSnapshotTwo-iowaitSnapshotOne ))
+deltaIrq=$(( irqSnapshotTwo-irqSnapshotOne ))
+deltaSoftirq=$(( softIrqSnapshotTwo-softIrqSnapshotOne ))
+deltaSteal=$(( stealSnapshotTwo-stealSnapshotOne ))
+
+totalCPUTime=$(( deltaUser+deltaNice+deltaSystem+deltaIdle+deltaIowait+deltaIrq+deltaSoftirq+deltaSteal ))
+busyCPUTime=$(( totalCPUTime-deltaIdle-deltaIowait ))
+
+
+if [ "$totalCPUTime" -eq 0 ] 
+then
+	echo "Impossible to compute usage of CPU: division by 0"
+else 
+	rawCPUUsage=$(( (busyCPUTime*10000)/$totalCPUTime ))
+	integer=$(( rawCPUUsage / 100 ))
+	decimal=$(( rawCPUUsage % 100 ))
+	CPUUsage=$(printf "%d.%02d" "$integer" "$decimal")
+fi
+
+#system load average, if > 1 the CPU is overworked)
+read oneMinuteLoad fiveMinutesLoad fifteenMinutesLoad _ < /proc/loadavg
