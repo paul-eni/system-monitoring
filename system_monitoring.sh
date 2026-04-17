@@ -33,14 +33,16 @@ if [ "$totalCPUTime" -eq 0 ]
 then
 	echo "Impossible to compute usage of CPU: division by 0"
 else 
-	rawCPUUsage=$(( (busyCPUTime*10000)/$totalCPUTime ))
-	integer=$(( rawCPUUsage / 100 ))
-	decimal=$(( rawCPUUsage % 100 ))
+	rawCPUUsage=$(( ($busyCPUTime*10000)/$totalCPUTime ))
+	integer=$(( $rawCPUUsage / 100 ))
+	decimal=$(( $rawCPUUsage % 100 ))
 	CPUUsage=$(printf "%d.%02d" "$integer" "$decimal")
 fi
+cPUUsageInPercent=$(printf "%s%%" "$CPUUsage")
 
 #system load average, if > 1 the CPU is overworked)
 read oneMinuteLoad fiveMinutesLoad fifteenMinutesLoad _ < /proc/loadavg
+loadAvg="$oneMinuteLoad, $fiveMinutesLoad, $fifteenMinutesLoad"
 
 
 
@@ -67,10 +69,11 @@ read totalDisk usedDisk availableDisk diskUsage < <(df -h --total | awk '/total/
 ### [SYSTEM] ###
 
 read uptimeInSeconds _ < /proc/uptime
+#removes . and miliseconds from the uptime
 uptimeInSeconds=${uptimeInSeconds%.*}
-uptimeDays=$(( uptimeInSeconds/86400 ))
-uptimeHours=$(( (uptimeInSeconds%86400)/3600 ))
-uptimeMinutes=$(( (uptimeInSeconds%3600)/60 ))
+uptimeDays=$(( $uptimeInSeconds/86400 ))
+uptimeHours=$(( ($uptimeInSeconds%86400)/3600 ))
+uptimeMinutes=$(( ($uptimeInSeconds%3600)/60 ))
 uptime=$(printf "%s days, %s hours, %s minutes" "$uptimeDays" "$uptimeHours" "$uptimeMinutes")
 
 # -e means that all processes are fetched and then only the PID column is kept with -o
@@ -91,37 +94,57 @@ ipInterfaces=$(ip -br address show up | awk '{print $1}' | paste -sd "," - | sed
 ports=$(ss -ltun | awk 'NR > 1 {split($5, a, ":"); print a[length(a)]}' | sort -u | paste -sd "," - | sed 's/,/, /' )
 
 
+addStyleToList() {
+	rawString=$(paste -sd ";" <<< $1)
+	prettyString=$(sed 's/;/, /g' <<< $rawString)
+	echo $prettyString
+}
+
+printConsole() {
+	printf "%-20s : %s\n" "$1" "$2"
+}
+
 
 ### [OUTPUT DISPLAY] ###
 
-printf "\n==================== SYSTEM MONITOR ====================\n\n"
+printf "\n==================== SYSTEM MONITOR ====================\n"
 
-printf "[CPU]\n"
-printf "%-20s : %s%%\n" "Usage" "$CPUUsage"
-loadavg="$oneMinuteLoad, $fiveMinutesLoad, $fifteenMinutesLoad"
-printf "%-20s : %s\n" "Load Average" "$loadavg"
+printf "\n[CPU]\n"
+
+printConsole "Usage" "$cPUUsageInPercent"
+printConsole "Load Average" "$loadAvg"
 
 printf "\n[MEMORY]\n"
-printf "%-20s : %s \n" "Total" "$totalMemory"
-printf "%-20s : %s \n" "Used" "$usedMemory"
-printf "%-20s : %s \n" "Available" "$availableMemory"
-printf "%-20s : %s \n" "Swap available" "$swapAvailable"
+
+printConsole "Total" "$totalMemory"
+printConsole "Used" "$usedMemory"
+printConsole "Available" "$availableMemory"
+printConsole "Swap available" "$swapAvailable"
 
 printf "\n[DISK]\n"
-printf "%-20s : %s \n" "Total" "$totalDisk"
-printf "%-20s : %s \n" "Used" "$usedDisk"
-printf "%-20s : %s \n" "Available" "$availableDisk"
-printf "%-20s : %s\n" "Usage" "$diskUsage"
+
+printConsole "Total" "$totalDisk"
+printConsole "Used" "$usedDisk"
+printConsole "Available" "$availableDisk"
+printConsole "Usage" "$diskUsage"
 
 printf "\n[SYSTEM]\n"
-printf "%-20s : %s\n" "Uptime" "$uptime"
-printf "%-20s : %s\n" "Processes" "$numberOfProc"
-printf "%-20s : %s\n" "Logged in users" "$currentlyLoggedInUsers"
+
+printConsole "Uptime" "$uptime"
+printConsole "Processes" "$numberOfProc"
+
+prettyCurrentlyLoggedInUsers=$(addStyleToList "$currentlyLoggedInUsers")
+printConsole "Logged in users" "$currentlyLoggedInUsers"
 
 printf "\n[NETWORK]\n"
 
-printf "%-20s : %s\n" "IP addresses" "$serverIPAddresses"
-printf "%-20s : %s\n" "IP interfaces" "$ipInterfaces"
-printf "%-20s : %s\n" "Listened ports" "$ports"
+prettyServerIPAddresses=$(addStyleToList "$serverIPAddresses")
+printConsole "IP addresses" "$prettyServerIPAddresses"
+
+prettyIpInterfaces=$(addStyleToList "$ipInterfaces")
+printConsole "IP interfaces" "$prettyIpInterfaces"
+
+prettyPorts=$(addStyleToList "$ports")
+printConsole "Listened ports" "$prettyPorts"
 
 printf "\n========================================================\n"
