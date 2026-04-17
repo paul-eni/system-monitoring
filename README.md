@@ -90,7 +90,6 @@ For instance, instead of using ```top ``` command for CPU usage, I searched for 
 ## Possible improvements
 
 Possible improvements:
-- Refactor output to separate data retrieval and display
 - Enhance network activity monitoring
 - Implement alerting for thresholds (CPU, memory, disk)
 - Convert the script into a real-time/live monitoring tool
