@@ -40,6 +40,21 @@ else
 fi
 cPUUsageInPercent=$(printf "%s%%" "$CPUUsage")
 
+commalessCPUUsage=$(sed 's/\.//' <<< $CPUUsage)
+intCPUUsage=""
+if [[ ${commalessCPUUsage:0:1} == "0" ]]
+then
+        intCPUUsage="${commalessCPUUsage:1}"
+else
+        intCPUUsage="$commalessCPUUsage"
+fi
+
+#test on 100 in the if to reflect 1%
+if (( $intCPUUsage > 100 ))
+then
+        echo "this is my test"
+fi
+
 #system load average, if > 1 the CPU is overworked)
 read oneMinuteLoad fiveMinutesLoad fifteenMinutesLoad _ < /proc/loadavg
 loadAvg="$oneMinuteLoad, $fiveMinutesLoad, $fifteenMinutesLoad"
